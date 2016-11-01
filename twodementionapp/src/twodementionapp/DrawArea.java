@@ -25,17 +25,18 @@ public class DrawArea extends JPanel{
     private Paint currentPaint;
     private Paint paint;
     private int currentShapeType;
-    private ArrayList<Shape> shapes;
+    private ArrayList<Shape> shapes = new ArrayList<Shape>();
     private boolean filled;
     private boolean dashed;
     private int lineWidth;
-    private float dashWidth;
+    private float dashLength;
     
     public DrawArea(JLabel coordinates) 
     {
         this.coordinates = coordinates;
         addMouseMotionListener(new MouseHandler());
-        
+        addMouseListener(new MouseHandler());
+        this.setBackground(Color.WHITE);
     }
     
     
@@ -50,13 +51,33 @@ public class DrawArea extends JPanel{
             this.startY = e.getY();
             Shape x;
             if (currentShapeType == 0)
-                x = new Line(startX, startY, paint, filled, dashed, lineWidth, dashWidth);
+                x = new Line(startX, startY, paint, filled, dashed, lineWidth, dashLength);
             else if (currentShapeType == 1)
-                x = new Oval(startX, startY, paint, filled, dashed, lineWidth, dashWidth);
+                x = new Oval(startX, startY, paint, filled, dashed, lineWidth, dashLength);
             else
-                x = new Rectangle(startX, startY, paint, filled, dashed, lineWidth, dashWidth);
+                x = new Rectangle(startX, startY, paint, filled, dashed, lineWidth, dashLength);
             shapes.add(x);
-        }    
+        }  
+        
+        @Override
+        public void mouseDragged(MouseEvent e)
+        {
+            shapes.get(shapes.size()-1).setX2(e.getX());
+            shapes.get(shapes.size()-1).setY2(e.getY());
+            repaint();
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e)
+        {
+            repaint();
+        }
+        
+        @Override
+        public void mouseMoved(MouseEvent e)
+        {
+            coordinates.setText("("+e.getX()+", " + e.getY()+")");
+        }
     }
     
     public void paintComponent(Graphics g)
@@ -85,4 +106,31 @@ public class DrawArea extends JPanel{
     else
         this.paint = color1;
     }
+    
+    public void setShapeType(int index)
+    {
+        this.currentShapeType = index;
+    }
+    
+    public void filled(boolean filled)
+    {
+        this.filled = filled;
+    }
+    
+    public void setLineWidth(int width)
+    {
+        this.lineWidth = width;
+    }
+    
+    public void setDashLength(float length)
+    {
+        this.dashLength = length;
+    }
+    
+    public void dashed(boolean dashed)
+    {
+        this.dashed = dashed;
+    }
+    
+    
 }

@@ -33,7 +33,7 @@ public class PaintArea extends JFrame {
     private JTextField dashLength;
     private JCheckBox DashedCheckbox;
     private DrawArea drawArea;
-    private JLabel coordinates;
+    private JLabel coordinates = new JLabel();
     private Color color1 = Color.WHITE;
     private Color color2 = Color.WHITE;
     public PaintArea()
@@ -45,6 +45,7 @@ public class PaintArea extends JFrame {
         JPanel firstLine = new JPanel();
         JPanel secondLine = new JPanel ();
         
+       
         //*******************first line begins***********************//
         //set the undo button
         undoButton = new JButton("undo");
@@ -126,7 +127,7 @@ public class PaintArea extends JFrame {
         
         //JCheckBox for dashed
         DashedCheckbox = new JCheckBox("Dashed");
-        DashedCheckbox.setActionListener(new DashCheckHandler());
+        DashedCheckbox.addActionListener(new DashCheckHandler());
         secondLine.add(DashedCheckbox);
         
         /////////////////////*****second line finished******////////////////
@@ -134,7 +135,7 @@ public class PaintArea extends JFrame {
         
         
         
-        JLabel coordinates = new JLabel();
+        JLabel coordinates = new JLabel("hello world");
         drawArea = new DrawArea(coordinates);
         
         //panel combination
@@ -154,7 +155,9 @@ public class PaintArea extends JFrame {
         drawPanel.add(buttonPanel, BorderLayout.NORTH);
         drawPanel.add(bottomPanel, BorderLayout.SOUTH);
         
-        add(drawPanel);
+        add(buttonPanel, BorderLayout.NORTH);
+        add(drawArea, BorderLayout.CENTER);
+        add(coordinates, BorderLayout.SOUTH);
     }
     
     private class UndoButtonHandler implements ActionListener
@@ -179,11 +182,67 @@ public class PaintArea extends JFrame {
     
     //TODO:SET Shape Option handler
     
+    private class ShapeOptionHandler implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            drawArea.setShapeType(shapeOptions.getSelectedIndex());
+        }
+    }
+    
     //TODO:SET Filled CheckBOx handler
     
-    //TODO:SET Gradient CHeckbox handler
+    private class FilledCheckedHandler implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            drawArea.filled(filledBox.isSelected());
+        }
     
+    }
+    //TODO:SET Gradient CHeckbox handler
+    private class GradientCheckBoxHandler implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            drawArea.setPaint(color1, color2, gradientBox.isSelected());
+        }
+    }
     //TODO: SET Line Width handler
     
+    private class LineWidthHandler implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            drawArea.setLineWidth(Integer.parseInt(lineWidth.getText()));
+        }
+    }
+    
     //TODO: SET Dash length handler
+    
+    private class DashLengthHandler implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            drawArea.setDashLength(Float.parseFloat(dashLength.getText()));
+        }
+    }
+    
+    //set dash checkbox
+    
+    private class DashCheckHandler implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            drawArea.dashed(DashedCheckbox.isSelected());
+        }
+    }
+
+
 }
