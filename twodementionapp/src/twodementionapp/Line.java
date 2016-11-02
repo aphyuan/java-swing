@@ -21,6 +21,7 @@ public class Line extends Shape{
         super(x1, y1, paint, filled, dashed, width, dashWidth);
     }
     
+    @Override
     public void draw(Graphics g)
     {
         Graphics2D graph = (Graphics2D) g;

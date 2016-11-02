@@ -16,24 +16,24 @@ public class PaintArea extends JFrame {
     private final JPanel drawPanel;
     private final JPanel buttonPanel;
     private final JPanel bottomPanel;
-    private JLabel shapetext;
-    private JComboBox<String> shapeOptions;
-    private JButton undoButton;
-    private JButton clearButton;
-    private JCheckBox filledBox;
+    private final JLabel shapetext;
+    private final JComboBox<String> shapeOptions;
+    private final JButton undoButton;
+    private final JButton clearButton;
+    private final JCheckBox filledBox;
 //    private JLabel filledtext;
     private JCheckBox gradientBox;
-    private JButton firstColorButton;
-    private JButton secondColorButton;
+    private final JButton firstColorButton;
+    private final JButton secondColorButton;
 //    private JColorChooser firstColorChooser;
 //    private JColorChooser secondColorChooser;
-    private JLabel lineText;
-    private JLabel dashText;
-    private JTextField lineWidth;
-    private JTextField dashLength;
-    private JCheckBox DashedCheckbox;
+    private final JLabel lineText;
+    private final JLabel dashText;
+    private final JTextField lineWidth;
+    private final JTextField dashLength;
+    private final JCheckBox DashedCheckbox;
     private DrawArea drawArea;
-    private JLabel coordinates = new JLabel();
+    private final JLabel coordinates;
     private Color color1 = Color.WHITE;
     private Color color2 = Color.WHITE;
     public PaintArea()
@@ -135,7 +135,7 @@ public class PaintArea extends JFrame {
         
         
         
-        JLabel coordinates = new JLabel("hello world");
+        coordinates = new JLabel("hello world");
         drawArea = new DrawArea(coordinates);
         
         //panel combination
