@@ -46,7 +46,7 @@ public class Oval extends Shape{
             graph.drawOval(smallerx, smallery, ovalWidth, ovalHeight);
         
         if (this.isDashed())
-            s = new BasicStroke(this.getWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 10, this.getDashedWidth(),0);
+            s = new BasicStroke(this.getWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL, 15, this.getDashedWidth(),0);
         else
             s = new BasicStroke(this.getWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
         
