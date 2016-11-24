@@ -1,3 +1,7 @@
+
+import java.sql.Date;
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -46,7 +50,7 @@ public class UserInterface extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Lucida Grande", 3, 14)); // NOI18N
         jLabel2.setText("Choose your date: ");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20160501", "20160720", "20160801", "20161231" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2016-05-01", "2016-07-20", "2016-08-01", "2016-12-31" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -169,7 +173,20 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-//        int result = 
+        
+        Date day = Date.valueOf(jComboBox1.getSelectedItem().toString());
+        BookingQueries bookingQueries = new BookingQueries();
+        int result = bookingQueries.addBooking(day,jTextField1.getText(),String.valueOf(jComboBox2.getSelectedItem()));
+        
+        if (result == 1)
+        {
+            JOptionPane.showMessageDialog(this, "successfully booked!", "You are added to the flight", JOptionPane.PLAIN_MESSAGE);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this, "Book failed", "error", JOptionPane.PLAIN_MESSAGE);
+        }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

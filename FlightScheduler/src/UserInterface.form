@@ -138,10 +138,10 @@
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="4">
-                    <StringItem index="0" value="20160501"/>
-                    <StringItem index="1" value="20160720"/>
-                    <StringItem index="2" value="20160801"/>
-                    <StringItem index="3" value="20161231"/>
+                    <StringItem index="0" value="2016-05-01"/>
+                    <StringItem index="1" value="2016-07-20"/>
+                    <StringItem index="2" value="2016-08-01"/>
+                    <StringItem index="3" value="2016-12-31"/>
                   </StringArray>
                 </Property>
               </Properties>
