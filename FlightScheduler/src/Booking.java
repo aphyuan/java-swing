@@ -1,4 +1,5 @@
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 
@@ -16,7 +17,7 @@ import java.sql.Timestamp;
  */
 public class Booking {
     private int bookingID;
-    private String day;
+    private Date day;
     private String name;
     private String flight;
 //    private Timestamp Created_at;
@@ -25,7 +26,7 @@ public class Booking {
     {
     }
     
-    public Booking(int bookingID, String day, String name, String flight)
+    public Booking(int bookingID, Date day, String name, String flight)
     {
         setBookingID(bookingID);
         setDay(day);
@@ -43,12 +44,12 @@ public class Booking {
         return bookingID;
     }
     
-    public void setDay(String day)
+    public void setDay(Date day)
     {
         this.day = day;
     }
     
-    public String getDay()
+    public Date getDay()
     {
         return day;
     }

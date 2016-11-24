@@ -18,14 +18,15 @@ public class BookingQueries {
     private Connection connection;
     private PreparedStatement getFlightSeats;
     private PreparedStatement insertNewCustomer;
+    private PreparedStatement getFlightStatus;
     
     public BookingQueries()
     {
         try{
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            insertNewCustomer = connection.prepareStatement("INSERT INTO bookings "+"(day, name, flight, Created_at) " + "VALUES (?, ?, ?, ?)");
-                    
+            insertNewCustomer = connection.prepareStatement("INSERT INTO bookings "+"(day, name, flight, Created_at) " + "VALUES (?, ?, ?, ?)");                  
             getFlightSeats = connection.prepareStatement("select count(flight) from bookings where flight = ? and day = ?"); 
+            getFlightStatus = connection.prepareStatement("select * From bookings where flight = ? and day = ? ORDER BY Created_at ASC FETCH FIRST ? ROWS ONLY");
                        
         }
         catch (SQLException sqlException)
@@ -55,6 +56,70 @@ public class BookingQueries {
             close();
         }
         return result;
+    }
+    
+    public List<Booking> getFlightDayStatus(Date day, String flight)
+    {
+        List <Booking> results = null;
+        ResultSet resultSet;
+        ResultSet seatSet;
+        int AvailableSeats = 5;
+        try
+        {
+        getFlightSeats.setString(1, flight);
+        getFlightSeats.setDate(2,day);
+        seatSet = getFlightSeats.executeQuery();
+        seatSet.next();
+        int seats;
+        seats = seatSet.getInt(1);
+        if(seats < AvailableSeats)
+        {
+            try
+            {
+                results = new ArrayList< Booking >();
+                
+                getFlightStatus.setString(1, flight);
+                getFlightStatus.setDate(2, day);
+                getFlightStatus.setInt(3, seats);
+                
+                resultSet = getFlightStatus.executeQuery();
+                while(resultSet.next())
+                {
+                    results.add(new Booking(resultSet.getInt("BookingID"),resultSet.getDate("day"),resultSet.getString("name"), resultSet.getString("flight")));
+                }
+            }
+            catch(SQLException sqlException)
+            {
+            sqlException.printStackTrace();
+            }
+        }
+        else
+        {
+            try
+                {
+                    results = new ArrayList< Booking >();
+
+                    getFlightStatus.setString(1, flight);
+                    getFlightStatus.setDate(2, day);
+                    getFlightStatus.setInt(3, 5);
+
+                    resultSet = getFlightStatus.executeQuery();
+                    while(resultSet.next())
+                    {
+                        results.add(new Booking(resultSet.getInt("BookingID"),resultSet.getDate("day"),resultSet.getString("name"), resultSet.getString("flight")));
+                    }
+                }
+                catch(SQLException sqlException)
+                {
+                sqlException.printStackTrace();
+                }
+            }
+        }
+        catch(SQLException sqlException)
+        {
+            sqlException.printStackTrace();
+        }
+        return results;
     }
     
     public void close()
