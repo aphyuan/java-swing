@@ -23,7 +23,7 @@ public class BookingQueries {
     {
         try{
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            insertNewCustomer = connection.prepareStatement("INSERT INTO bookings "+"(day, name, flight) " + "VALUES (?, ?, ?)");
+            insertNewCustomer = connection.prepareStatement("INSERT INTO bookings "+"(day, name, flight, Created_at) " + "VALUES (?, ?, ?, ?)");
                     
             getFlightSeats = connection.prepareStatement("select count(flight) from bookings where flight = ? and day = ?"); 
                        
@@ -43,6 +43,9 @@ public class BookingQueries {
             insertNewCustomer.setDate(1, day);
             insertNewCustomer.setString(2, name);
             insertNewCustomer.setString(3, flight);
+            java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+            insertNewCustomer.setTimestamp(4, currentTimestamp);
+            
             
             result = insertNewCustomer.executeUpdate();
         }

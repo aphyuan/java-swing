@@ -1,4 +1,7 @@
 
+import java.sql.Timestamp;
+
+
 //import java.sql.Date;
 
 /*
@@ -16,6 +19,7 @@ public class Booking {
     private String day;
     private String name;
     private String flight;
+//    private Timestamp Created_at;
     //constructor
     public Booking()
     {
