@@ -20,18 +20,20 @@ public class Booking {
     private Date day;
     private String name;
     private String flight;
+    private Timestamp created_at;
 //    private Timestamp Created_at;
     //constructor
     public Booking()
     {
     }
     
-    public Booking(int bookingID, Date day, String name, String flight)
+    public Booking(int bookingID, Date day, String name, String flight, Timestamp created_at)
     {
         setBookingID(bookingID);
         setDay(day);
         setName(name);
         setFlight(flight);
+        setCreatedAt(created_at);
     }
     
     public void setBookingID(int bookingID)
@@ -72,5 +74,15 @@ public class Booking {
     public String getFlight()
     {
         return flight;
+    }
+    
+    public void setCreatedAt(Timestamp created_at)
+    {
+        this.created_at = created_at;
+    }
+    
+    public Timestamp getCreatedAt()
+    {
+        return created_at;
     }
 }

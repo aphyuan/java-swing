@@ -192,6 +192,11 @@ public class UserInterface extends javax.swing.JFrame {
         jComboBox6.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2016-05-01", "2016-07-20", "2016-08-01", "2016-12-31" }));
 
         jButton3.setText("check");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jTextArea2.setEditable(false);
         jTextArea2.setColumns(20);
@@ -267,8 +272,8 @@ public class UserInterface extends javax.swing.JFrame {
                     .addComponent(jButton3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -322,29 +327,58 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        int numberofEntries;
         jTextArea1.setText(null);
         d = Date.valueOf(jComboBox4.getSelectedItem().toString());
 //        System.out.print(day);
         String flight = jComboBox3.getSelectedItem().toString();
         BookingQueries bookingQueries = new BookingQueries();
         List< Booking > result = bookingQueries.getFlightDayStatus(d, flight);
-        int numberofEntries = result.size();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        if (result == null)
+            numberofEntries = 0;
+        else
+            numberofEntries = result.size();
+        if (numberofEntries == 0)
+        {
+            jTextArea1.append("No result found");
+        }
         if (numberofEntries != 0)
         {
-            String text;
             for(int i=0; i< numberofEntries; i++)
             {
                 currentEntry = result.get(i);
-//                jTextArea1.append(Integer.toString(currentEntry.getBookingID()));
-                jTextArea1.append("Date: "+dateFormat.format(currentEntry.getDay()));
                 jTextArea1.append(" Name: "+currentEntry.getName());
-                jTextArea1.append(" Flight: " + currentEntry.getFlight()+"\n");
+                jTextArea1.append(", Booked at: " + currentEntry.getCreatedAt() + "\n");
 
             }
         
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        jTextArea2.setText(null);
+        d = Date.valueOf(jComboBox6.getSelectedItem().toString());
+        String flight = jComboBox5.getSelectedItem().toString();
+        BookingQueries waitingQueries = new BookingQueries();
+        List< Booking > result = waitingQueries.getWaitlistStatus(d, flight);
+        int numberofEntries = result.size();
+        if (numberofEntries == 0)
+        {
+            jTextArea2.append("No result found");
+        }
+        if (numberofEntries != 0)
+        {
+            for(int i=0; i< numberofEntries; i++)
+            {
+                currentEntry = result.get(i);
+                jTextArea2.append("Name: "+currentEntry.getName());
+                jTextArea2.append(", Booked at: " + currentEntry.getCreatedAt() + "\n");
+
+            }
+        
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
