@@ -313,10 +313,14 @@ public class UserInterface extends javax.swing.JFrame {
         Date day = Date.valueOf(jComboBox1.getSelectedItem().toString());
         BookingQueries bookingQueries = new BookingQueries();
         int result = bookingQueries.addBooking(day,jTextField1.getText(),String.valueOf(jComboBox2.getSelectedItem()));
+        List< Booking > thewaitlist = bookingQueries.getWaitlistStatus(day, String.valueOf(jComboBox2.getSelectedItem()));
         
         if (result == 1)
         {
-            JOptionPane.showMessageDialog(this, "successfully booked!", "You are added to the flight", JOptionPane.PLAIN_MESSAGE);
+            if (thewaitlist == null)
+                JOptionPane.showMessageDialog(this, "successfully booked!", "You are added to the flight", JOptionPane.PLAIN_MESSAGE);
+            else
+                JOptionPane.showMessageDialog(this, "successfully booked! (waitlist)", "You are added to the waitlist", JOptionPane.PLAIN_MESSAGE);
         }
         else
         {
