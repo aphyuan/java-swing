@@ -21,19 +21,21 @@ public class Booking {
     private String name;
     private String flight;
     private Timestamp created_at;
+    private Boolean waitlist;
 //    private Timestamp Created_at;
     //constructor
     public Booking()
     {
     }
     
-    public Booking(int bookingID, Date day, String name, String flight, Timestamp created_at)
+    public Booking(int bookingID, Date day, String name, String flight, Timestamp created_at, boolean waitlist)
     {
         setBookingID(bookingID);
         setDay(day);
         setName(name);
         setFlight(flight);
         setCreatedAt(created_at);
+        setWaitlist(waitlist);
     }
     
     public void setBookingID(int bookingID)
@@ -84,5 +86,15 @@ public class Booking {
     public Timestamp getCreatedAt()
     {
         return created_at;
+    }
+    
+    public void setWaitlist(boolean waitlist)
+    {
+        this.waitlist = waitlist;
+    }
+    
+    public Boolean getWaitlist()
+    {
+        return waitlist;
     }
 }
