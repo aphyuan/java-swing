@@ -661,7 +661,7 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        
+        model3.removeAllElements();
         Date day = Date.valueOf(jComboBox2.getSelectedItem().toString());
         BookingQueries bookingQueries = new BookingQueries();
         boolean flightbooked = bookingQueries.checkBooked(String.valueOf(jComboBox1.getSelectedItem()), day, jTextField1.getText());
@@ -685,6 +685,14 @@ public class UserInterface extends javax.swing.JFrame {
         }
         jPanel1.revalidate();
         jPanel1.repaint();
+        jPanel4.revalidate();
+        jPanel4.repaint();
+       
+        int size = theCustomerString().length;
+        for(int i=0; i<size; i++)
+        {
+            model3.addElement(theCustomerString()[i]);
+        }
         jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -812,29 +820,6 @@ public class UserInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-//        jTextArea2.setText(null);
-//        d = Date.valueOf(jComboBox6.getSelectedItem().toString());
-//        String flight = jComboBox5.getSelectedItem().toString();
-//        BookingQueries waitingQueries = new BookingQueries();
-//        List< Booking > result = waitingQueries.getWaitlistStatus(d, flight);
-//        int numberofEntries = result.size();
-//        if (numberofEntries == 0)
-//        {
-//            jTextArea2.append("No result found");
-//        }
-//        if (numberofEntries != 0)
-//        {
-//            for(int i=0; i< numberofEntries; i++)
-//            {
-//                currentEntry = result.get(i);
-//                jTextArea2.append("Name: "+currentEntry.getName());
-//                jTextArea2.append(", Booked at: " + currentEntry.getCreatedAt() + "\n");
-//                jTextArea2.append("..." + currentEntry.getWaitlist());
-//            }
-//        
-//        }
-
-
 // TODO add your handling code here:
         jTextArea3.setText("");
         jTextArea4.setText("");
@@ -851,7 +836,7 @@ public class UserInterface extends javax.swing.JFrame {
             for(int i=0; i < numberofEntries; i++)
             {
                 currentEntry = result.get(i);
-                jTextArea3.append("Flight"+currentEntry.getFlight());
+                jTextArea3.append("Flight "+currentEntry.getFlight());
                 jTextArea3.append(" at DAY: " + currentEntry.getDay()+"\n");
             }
         }
@@ -866,7 +851,7 @@ public class UserInterface extends javax.swing.JFrame {
             for(int j =0; j< waitlistEntries; j++)
             {
                 currentEntry = waitlistResult.get(j);
-                jTextArea4.append("Flight"+currentEntry.getFlight());
+                jTextArea4.append("Flight "+currentEntry.getFlight());
                 jTextArea4.append(" at Day: "+currentEntry.getDay()+"\n");
             }
         }
@@ -882,7 +867,9 @@ public class UserInterface extends javax.swing.JFrame {
         String flight = jComboBox9.getSelectedItem().toString();
         String name = jComboBox10.getSelectedItem().toString();
         int result = 0;
+        
         BookingQueries deletequeries =new BookingQueries();
+        
         result = deletequeries.deleteBooking(d, name, flight);
         if (result == 1)
         {
@@ -948,18 +935,31 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // TODO add your handling code here:
-        
+        int dropwaitlistresult = 0;
+        int Deleteresult = 0;
         String flight = jComboBox11.getSelectedItem().toString();
         BookingQueries deleteFlightQueries = new BookingQueries();
         int result = deleteFlightQueries.deleteFlight(flight);
         if (result == 1)
         {
-            
+            dropwaitlistresult = deleteFlightQueries.dropTheWaitlist(flight);
+            Deleteresult = deleteFlightQueries.updateFlight(flight);
+            if(Deleteresult==0)
+            {
+                
+                JOptionPane.showMessageDialog(this, "success arrangement!", "All the customers are arranged to a new flight", JOptionPane.PLAIN_MESSAGE);
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this, "success drop the flight!", "part of customers are arranged to new flight, some are dropped due to the full booking", JOptionPane.PLAIN_MESSAGE);
+            }
         }
         else
         {
             JOptionPane.showMessageDialog(this, "Drop flight failed", "error", JOptionPane.PLAIN_MESSAGE);
-        }   
+        }
+        
+        model.removeElement(flight);
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jComboBox11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox11ActionPerformed
@@ -1066,7 +1066,7 @@ public class UserInterface extends javax.swing.JFrame {
     private List<Booking> results;
     private DefaultComboBoxModel model = new DefaultComboBoxModel(theFlightString());
     private DefaultComboBoxModel model2 = new DefaultComboBoxModel(theDateString());
-    private DefaultComboBoxModel model3 = new DefaultComboBoxModel(theCustomerString());
+     private DefaultComboBoxModel model3 = new DefaultComboBoxModel(theCustomerString());
     private DefaultComboBoxModel model4 = new DefaultComboBoxModel();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

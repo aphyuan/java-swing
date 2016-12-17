@@ -32,6 +32,14 @@ public class BookingQueries {
     private PreparedStatement cancelFlight;
     private PreparedStatement getStatusbyname;
     private PreparedStatement getWaitlistbyname;
+    private PreparedStatement dropFlightWaitlist;
+    private PreparedStatement updateFlightstatement;
+    private PreparedStatement cancelBookingforDrop;
+    private PreparedStatement updateWaitlistwhencancel;
+    private PreparedStatement getBookedFlightSeats;
+    private PreparedStatement selectupdateFlightStatement;
+    private Flight currentFlight;
+    private FlightDate currentDate;
     public BookingQueries()
     {
         try{
@@ -40,6 +48,8 @@ public class BookingQueries {
             insertNewFlight = connection.prepareStatement("INSERT INTO Flights "+"(flight, seats) " + "VALUES (?, ?)");
             insertNewDate = connection.prepareStatement("INSERT INTO Days " + "(date) " +"VALUES (?)");
             getFlightSeats = connection.prepareStatement("select count(flight) from bookings where flight = ? and day = ?"); 
+            getBookedFlightSeats = connection.prepareStatement("select count(flight) from bookings where flight = ? and day = ? and waitlist = false"); 
+
             getFlightStatus = connection.prepareStatement("select * From bookings where flight = ? and day = ? ORDER BY Created_at ASC FETCH FIRST ? ROWS ONLY");
             getSeatNumber = connection.prepareStatement("select seats From Flights where flight = ?");
             getWaitListStatus = connection.prepareStatement("select * from bookings WHERE flight = ? and day = ? ORDER BY Created_at OFFSET ? ROWS");
@@ -49,15 +59,141 @@ public class BookingQueries {
             checkCustomerNameDayFlight = connection.prepareStatement("select * from bookings WHERE flight = ? and day = ? and name = ?");
             checkCustomerDayFlight = connection.prepareStatement("select * from bookings WHERE day = ? and waitlist = false and name = ?");
             cancelBooking = connection.prepareStatement("DELETE FROM bookings WHERE flight = ? and day = ? and name = ?");
+            cancelBookingforDrop = connection.prepareStatement("DELETE FROM bookings WHERE flight = ?");
             cancelFlight = connection.prepareStatement("DELETE FROM Flights where flight = ?");
             getStatusbyname = connection.prepareStatement("select * from bookings where name = ? and waitlist = false ORDER BY day ASC");
             getWaitlistbyname = connection.prepareStatement("select * from bookings where name = ? and waitlist = true ORDER BY day ASC");
+            dropFlightWaitlist = connection.prepareStatement("DELETE FROM bookings WHERE flight = ? and waitlist = true");
+//            selectupdateFlightStatement = connection.prepareStatement("SELECT * from bookings WHERE flight = ? and day = ? and waitlist = false fetch First ? ROWS ONLY");
+            updateFlightstatement = connection.prepareStatement("UPDATE bookings SET flight = ? WHERE EXISTS(select * from bookings WHERE flight = ? and day =? and waitlist = false FETCH FIRST ? ROWS ONLY)");
+            updateWaitlistwhencancel = connection.prepareStatement("UPDATE bookings SET waitlist = false WHERE flight = ? and day = ? and waitlist = true");
         }   
         catch (SQLException sqlException)
         {
             sqlException.printStackTrace();
             System.exit(1);
         }
+    }
+    
+    public int dropTheWaitlist(String flight)
+    {
+        int result = 0;
+        try{
+            dropFlightWaitlist.setString(1, flight);
+            result = dropFlightWaitlist.executeUpdate();
+            
+            System.out.print(result);
+        }
+        catch(SQLException sqlException)
+        {
+            sqlException.printStackTrace();
+            close();
+        }
+        return result;  
+    }
+    
+    public int updateFlight(String flight)
+    {
+        int result = 0;
+        int updaterow = 0;
+        String theflight;
+        Date theDate;
+        List<FlightDate> allDate = null;
+        List<Flight> allFlight = null;
+        allFlight = getFlights();
+        allDate = getDates();
+        int numbershouldchangefortotal = 0;
+        int numberofDates = allDate.size();
+        int numberofEntries = allFlight.size();
+   
+        for(int j=0; j< numberofDates; j++){
+            currentDate = allDate.get(j);
+            theDate = currentDate.getDate();
+            ResultSet seatnum;
+            int seatnumber = 0;
+            int overallrow = 0; 
+            try
+            {
+                getBookedFlightSeats.setString(1, flight);
+                getBookedFlightSeats.setDate(2, theDate);
+                seatnum = getBookedFlightSeats.executeQuery();
+                
+                if (seatnum.next())
+                {
+                seatnumber = seatnum.getInt(1);
+                System.out.print("seatnum:"+seatnumber);
+                }
+                
+            }
+            catch(SQLException sqlException)
+            {
+                sqlException.printStackTrace();
+                close();
+            }
+            numbershouldchangefortotal += seatnumber;
+            for(int i=0; i< numberofEntries;i++)
+            {
+            ResultSet seatnumberresult = null;
+            int seatnumforFlight = 0;
+            int rowforupdate = 0;
+            currentFlight = allFlight.get(i);
+            theflight = currentFlight.getFlight();
+            try
+            {
+                getSeatNumber.setString(1, theflight);
+                seatnumberresult = getSeatNumber.executeQuery();
+                if(seatnumberresult.next())
+                {
+                    seatnumforFlight = seatnumberresult.getInt("seats");
+                }
+            }
+            catch(SQLException sqlException)
+            {
+                sqlException.printStackTrace();
+                close();
+            }
+            if(seatnumforFlight <= seatnumber)
+            {
+                rowforupdate = seatnumforFlight;
+                seatnumber-=seatnumforFlight;
+            }
+            else
+            {
+                rowforupdate = seatnumber;
+                seatnumber = 0;
+            }
+            if(rowforupdate > 0){
+            try
+            {
+                updateFlightstatement.setString(1, theflight);
+                updateFlightstatement.setString(2, flight);
+                updateFlightstatement.setDate(3, theDate);
+                updateFlightstatement.setInt(4, rowforupdate);
+                updaterow = updateFlightstatement.executeUpdate();
+                System.out.print("updaterow"+updaterow);
+                overallrow += updaterow;
+                
+            }
+             catch(SQLException sqlException)
+            {
+                sqlException.printStackTrace();
+                close();
+            }
+            }
+            }
+        }
+        
+        try{
+            cancelBookingforDrop.setString(1, flight);
+            result = cancelBookingforDrop.executeUpdate();
+        }
+        catch(SQLException sqlException)
+        {
+                sqlException.printStackTrace();
+                close();
+        }
+        
+        return result;
     }
     public int deleteFlight(String flight)
     {
@@ -76,20 +212,57 @@ public class BookingQueries {
     }         
     public int deleteBooking(Date day, String name, String flight)
     {
+        boolean checkwaitlist = false;
         int result = 0;
+        int updatewaitlistresult;
+        ResultSet resultSet = null;
         try
         {
-            cancelBooking.setString(1, flight);
-            cancelBooking.setDate(2, day);
-            cancelBooking.setString(3, name);
-            result = cancelBooking.executeUpdate();
-            
+            checkCustomerNameDayFlight.setString(1, flight);
+            checkCustomerNameDayFlight.setDate(2, day);
+            checkCustomerNameDayFlight.setString(3, name);
+            resultSet = checkCustomerNameDayFlight.executeQuery();
+            if(resultSet.next())
+            {
+                checkwaitlist = resultSet.getBoolean("waitlist");
+            }
         }
         catch(SQLException sqlException)
         {
             sqlException.printStackTrace();
             close();
         }
+        
+        if(!checkwaitlist)
+        {
+            try{
+                updateWaitlistwhencancel.setString(1, flight);
+                updateWaitlistwhencancel.setDate(2, day);
+                        
+           updatewaitlistresult = updateWaitlistwhencancel.executeUpdate();
+            }
+            catch(SQLException sqlException)
+            {
+                sqlException.printStackTrace();
+                close();
+            }
+            }
+        
+        try
+        {
+        cancelBooking.setString(1, flight);
+        cancelBooking.setDate(2, day);
+        cancelBooking.setString(3, name);
+        result = cancelBooking.executeUpdate();
+        System.out.print("cancelbooking:line"+result);
+        }
+        catch(SQLException sqlException)
+        {
+        sqlException.printStackTrace();
+        close();
+        }
+        
+        
         return result;
     }
     
@@ -117,10 +290,10 @@ public class BookingQueries {
         int row = 0;
         try
         {
-            getWaitListStatus.setString(1, flight);
-            getWaitListStatus.setDate(2, day);
-            getWaitListStatus.setInt(3, seatnumber);
-            flightS = getWaitListStatus.executeQuery();
+            getFlightStatus.setString(1, flight);
+            getFlightStatus.setDate(2, day);
+            getFlightStatus.setInt(3, seatnumber);
+            flightS = getFlightStatus.executeQuery();
             while(flightS.next())
             {
                 row++;
@@ -132,7 +305,7 @@ public class BookingQueries {
             close();
         }
         int result = 0;
-        if (row == 0)
+        if (row < seatnumber)
         {
             waitlist = false;
         }
